@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
-
+    id ("com.google.dagger.hilt.android")
 }
 
 android {
@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.selfconfidencefit"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -42,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
         resources {
@@ -56,7 +56,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.50")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation(libs.androidx.compose.material)
-    ksp("com.google.dagger:hilt-compiler:2.50")
+    ksp(libs.hilt.compiler)
 
     //navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")

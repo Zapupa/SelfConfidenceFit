@@ -6,7 +6,7 @@ import com.example.selfconfidencefit.data.local.dao.StepsDao
 import com.example.selfconfidencefit.data.local.models.StepsDay
 import com.example.selfconfidencefit.data.local.models.StepsGoal
 
-@Database(entities = [StepsDay::class, StepsGoal::class], version = 1)
+@Database(entities = [StepsDay::class, StepsGoal::class], version = 1, exportSchema = false)
 abstract class DatabaseApp : RoomDatabase() {
     abstract val stepsDao: StepsDao
 }
