@@ -13,11 +13,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StepsViewModel @Inject constructor(private val repository: StepsRepository) : ViewModel() {
-    fun readStepsDay(key: Long) : StepsDay? = repository.getStepsDay(key)
+    fun readStepsDay(key: Long) : LiveData<StepsDay?> = repository.getStepsDay(key)
 
     fun readAllStepsDays() : LiveData<List<StepsDay>> = repository.getAllStepsDays
 
-    fun readLatestStepsDay() : StepsDay = repository.getLatestStepsDay
+    fun readLatestStepsDay() : LiveData<StepsDay> = repository.getLatestStepsDay
 
     fun readLatestStepsDayObservable() : LiveData<StepsDay> = repository.getLatestStepsDayObservable
 
@@ -71,7 +71,7 @@ class StepsViewModel @Inject constructor(private val repository: StepsRepository
         }
     }
 
-    fun readGoal(key: Long): StepsGoal? = repository.getGoal(key)
+    fun readGoal(key: Long): LiveData<StepsGoal?> = repository.getGoal(key)
 
     fun readAllGoals(): LiveData<List<StepsGoal>> = repository.getAllGoals
 

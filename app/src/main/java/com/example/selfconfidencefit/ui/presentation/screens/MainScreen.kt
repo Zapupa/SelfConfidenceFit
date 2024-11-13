@@ -18,6 +18,8 @@ import com.example.selfconfidencefit.viewmodel.StepsViewModel
 @Composable
 fun MainScreen(navController: NavController){
     val day : String= "day"
+    val stepVM = hiltViewModel<StepsViewModel>()
+
     Card(
         modifier = Modifier
             .padding(18.dp, 0.dp)

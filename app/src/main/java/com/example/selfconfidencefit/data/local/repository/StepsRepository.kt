@@ -22,13 +22,13 @@ class StepsRepository @Inject constructor(private val database: DatabaseApp) : I
         onSuccess()
     }
 
-    override fun getStepsDay(key: Long): StepsDay? {
+    override fun getStepsDay(key: Long): LiveData<StepsDay?> {
         return database.stepsDao.getStepsDay(key)
     }
 
     override val getAllStepsDays: LiveData<List<StepsDay>> = database.stepsDao.getAllStepsDays()
 
-    override val getLatestStepsDay: StepsDay = database.stepsDao.getLatestStepsDay()
+    override val getLatestStepsDay: LiveData<StepsDay> = database.stepsDao.getLatestStepsDay()
 
     override val getLatestStepsDayObservable: LiveData<StepsDay> = database.stepsDao.getLatestStepsDayObservable()
 
@@ -57,7 +57,7 @@ class StepsRepository @Inject constructor(private val database: DatabaseApp) : I
         onSuccess()
     }
 
-    override fun getGoal(key: Long): StepsGoal? {
+    override fun getGoal(key: Long): LiveData<StepsGoal?> {
         return database.stepsDao.getGoal(key)
     }
 

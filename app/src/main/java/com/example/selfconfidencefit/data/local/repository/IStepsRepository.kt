@@ -12,11 +12,11 @@ interface IStepsRepository {
 
     suspend fun addLatestSteps(stepsToAdd: Int, onSuccess: ()-> Unit)
 
-    fun getStepsDay(key: Long): StepsDay?
+    fun getStepsDay(key: Long): LiveData<StepsDay?>
 
     val getAllStepsDays: LiveData<List<StepsDay>>
 
-    val getLatestStepsDay: StepsDay //val?
+    val getLatestStepsDay: LiveData<StepsDay> //val?
 
     val getLatestStepsDayObservable: LiveData<StepsDay> //val
 
@@ -31,7 +31,7 @@ interface IStepsRepository {
 
     suspend fun deleteGoal(goal: StepsGoal, onSuccess: ()-> Unit)
 
-    fun getGoal(key: Long): StepsGoal?
+    fun getGoal(key: Long): LiveData<StepsGoal?>
 
     val getAllGoals: LiveData<List<StepsGoal>>
 

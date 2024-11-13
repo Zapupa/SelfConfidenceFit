@@ -20,11 +20,11 @@ interface StepsDao {
     @Query("UPDATE steps_days SET steps = steps + :stepsToAdd WHERE id IN(SELECT id FROM steps_days ORDER BY date DESC LIMIT 1)")
     suspend fun addLatestSteps(stepsToAdd: Int)
     @Query("SELECT * FROM steps_days WHERE id = :key")
-    fun getStepsDay(key: Long): StepsDay?
+    fun getStepsDay(key: Long): LiveData<StepsDay?>
     @Query("SELECT * FROM steps_days ORDER BY date DESC")
     fun getAllStepsDays(): LiveData<List<StepsDay>> //val
     @Query("SELECT * FROM steps_days ORDER BY date DESC LIMIT 1")
-    fun getLatestStepsDay(): StepsDay //val?
+    fun getLatestStepsDay(): LiveData<StepsDay> //val?
     @Query("SELECT * FROM steps_days ORDER BY date DESC LIMIT 1")
     fun getLatestStepsDayObservable(): LiveData<StepsDay> //val
     @Query("DELETE FROM steps_days WHERE id NOT IN(SELECT id FROM steps_days ORDER BY date DESC LIMIT 1)")
@@ -40,7 +40,7 @@ interface StepsDao {
     @Delete
     suspend fun deleteGoal(goal: StepsGoal)
     @Query("SELECT * FROM steps_goals WHERE id = :key")
-    fun getGoal(key: Long): StepsGoal?
+    fun getGoal(key: Long): LiveData<StepsGoal?>
     @Query("SELECT * FROM steps_goals")
     fun getAllGoals(): LiveData<List<StepsGoal>> //val
 }
