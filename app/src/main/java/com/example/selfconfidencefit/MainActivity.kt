@@ -1,5 +1,7 @@
 package com.example.selfconfidencefit
 
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,6 +33,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.example.selfconfidencefit.di.MainModule.provideDatabase
+import com.example.selfconfidencefit.receiver.DateChangedBroadcastReceiver
 import com.example.selfconfidencefit.ui.presentation.navigation.Screen
 import com.example.selfconfidencefit.ui.presentation.navigation.SetupNavHost
 import com.example.selfconfidencefit.ui.theme.Gray
@@ -43,6 +47,8 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dateChangedBroadcastReceiver = DateChangedBroadcastReceiver(provideDatabase(application))
+        this.registerReceiver(dateChangedBroadcastReceiver, IntentFilter(Intent.ACTION_DATE_CHANGED))
         enableEdgeToEdge()
         setContent {
             SelfConfidenceFitTheme {
@@ -50,7 +56,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     bottomBar = {
                         BottomAppBar(
-                            containerColor = Gray,
+                            containerColor = Color.Black,
                             modifier = Modifier.fillMaxWidth()
                         ){
                             Row(
@@ -63,6 +69,7 @@ class MainActivity : ComponentActivity() {
                                     Icon(
                                         painter = painterResource(R.drawable.homeicon),
                                         contentDescription = "Localized description",
+                                        tint = Color.White,
                                         modifier = Modifier
                                             .size(30.dp)
                                     )
@@ -73,6 +80,7 @@ class MainActivity : ComponentActivity() {
                                     Icon(
                                         painter = painterResource(R.drawable.exercisesicon),
                                         contentDescription = "Localized description",
+                                        tint = Color.White,
                                         modifier = Modifier
                                             .size(30.dp)
                                     )
@@ -83,6 +91,7 @@ class MainActivity : ComponentActivity() {
                                     Icon(
                                         painter = painterResource(R.drawable.foodicon),
                                         contentDescription = "Localized description",
+                                        tint = Color.White,
                                         modifier = Modifier
                                             .size(30.dp)
                                     )
@@ -93,6 +102,7 @@ class MainActivity : ComponentActivity() {
                                     Icon(
                                         painter = painterResource(R.drawable.profileicon),
                                         contentDescription = "Localized description",
+                                        tint = Color.White,
                                         modifier = Modifier
                                             .size(30.dp)
                                     )
