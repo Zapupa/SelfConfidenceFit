@@ -29,6 +29,7 @@ import com.example.selfconfidencefit.viewmodel.StepsViewModel
 fun MainScreen(navController: NavController){
     val stepVM = hiltViewModel<StepsViewModel>()
     val stepDays = stepVM.readAllStepsDays().observeAsState(listOf()).value
+    val lastDay = stepVM.readLatestStepsDayObservable().observeAsState().value
 
     LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(stepDays) { stepDay ->
@@ -61,7 +62,7 @@ fun MainScreen(navController: NavController){
                 )
 
                 Text(
-                    text = "4 214",
+                    text = lastDay?.steps.toString(),
                     style = MaterialTheme.typography.headlineLarge,
                     fontSize = 50.sp,
                     color = Color.White
@@ -125,7 +126,7 @@ fun MainScreen(navController: NavController){
 @Composable
 fun StepItem(stepDay: StepsDay, viewModel: StepsViewModel) {
     Card {
-        Text(text = "fas")
+        Text(text = stepDay.date)
         Text(text = stepDay.steps.toString())
     }
 }
