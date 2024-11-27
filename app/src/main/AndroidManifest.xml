@@ -28,6 +28,12 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".service.StepsSensorService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
         <receiver android:name=".receiver.DateChangedBroadcastReceiver"
             android:exported="true">
             <intent-filter>

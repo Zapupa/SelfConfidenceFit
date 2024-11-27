@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.0"
+composeBomVersion = "2023.10.01"
 hiltCompiler = "2.50"
 kotlin = "1.9.22"
 coreKtx = "1.13.1"
@@ -12,7 +13,11 @@ composeBom = "2024.04.01"
 composeMaterial = "1.4.0"
 
 [libraries]
+activity-compose = { module = "androidx.activity:activity-compose" }
+androidx-compose-bom-v20231001 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-material = { module = "androidx.compose.material:material" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
