@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "317308762943",
+    "project_id": "selfconfidencefit",
+    "storage_bucket": "selfconfidencefit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317308762943:android:f6e9bfaea4493f29bb718a",
+        "android_client_info": {
+          "package_name": "com.example.selfconfidencefit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "317308762943-14p9rat75veolr3q2m0atmj8l42poukq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtOyRf33jyD6r2xQDIvEEM3sfCgpI0Vwc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "317308762943-14p9rat75veolr3q2m0atmj8l42poukq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
