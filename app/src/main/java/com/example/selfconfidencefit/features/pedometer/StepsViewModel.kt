@@ -2,13 +2,16 @@ package com.example.selfconfidencefit.features.pedometer
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.selfconfidencefit.data.local.models.StepsDay
 import com.example.selfconfidencefit.data.local.models.StepsGoal
 import com.example.selfconfidencefit.data.local.repository.StepsRepository
+import com.example.selfconfidencefit.utils.DateFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,13 +24,9 @@ class StepsViewModel @Inject constructor(private val repository: StepsRepository
 
     fun readLatestStepsDayObservable() : LiveData<StepsDay> = repository.getLatestStepsDayObservable
 
-    fun insertStepsDay(steps: StepsDay, onSuccess: () -> Unit) {
+    fun insertStepsDay(steps: StepsDay) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.insertStepsDay(steps) {
-                viewModelScope.launch(Dispatchers.Main) {
-                    onSuccess()
-                }
-            }
+            repository.insertStepsDay(steps)
         }
     }
 
@@ -104,4 +103,10 @@ class StepsViewModel @Inject constructor(private val repository: StepsRepository
             }
         }
     }
+
+    val todaySteps: LiveData<Int> = liveData {
+        val today = DateFormat.standardFormat(Date())
+        repository.getStepsByDate(today)?.steps?.let { emit(it) } ?: emit(0)
+    }
+
 }

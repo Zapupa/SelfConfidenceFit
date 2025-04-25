@@ -1,9 +1,9 @@
 package com.example.selfconfidencefit.di
 
 import android.app.Application
-import androidx.room.Room
 import com.example.selfconfidencefit.data.local.DatabaseApp
 import com.example.selfconfidencefit.data.local.dao.StepsDao
+import com.example.selfconfidencefit.data.local.repository.StepsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,5 +23,11 @@ object MainModule {
     @Provides
     fun provideStepsDao(databaseApp: DatabaseApp): StepsDao{
         return databaseApp.stepsDao
+    }
+
+    @Singleton
+    @Provides
+    fun provideStepsRepository(stepsDao: StepsDao): StepsRepository{
+        return StepsRepository(stepsDao)
     }
 }

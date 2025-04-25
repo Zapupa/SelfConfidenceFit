@@ -3,63 +3,67 @@ package com.example.selfconfidencefit.data.local.repository
 import androidx.lifecycle.LiveData
 import com.example.selfconfidencefit.data.local.models.StepsDay
 import com.example.selfconfidencefit.data.local.models.StepsGoal
-import com.example.selfconfidencefit.data.local.DatabaseApp
+import com.example.selfconfidencefit.data.local.dao.StepsDao
 import javax.inject.Inject
 
-class StepsRepository @Inject constructor(private val database: DatabaseApp) : IStepsRepository{
-    override suspend fun insertStepsDay(steps: StepsDay, onSuccess: () -> Unit) {
-        database.stepsDao.insertStepsDay(steps)
-        onSuccess()
+class StepsRepository @Inject constructor(private val stepsDao: StepsDao) : IStepsRepository{
+    override suspend fun insertStepsDay(steps: StepsDay) {
+        stepsDao.insertStepsDay(steps)
+//        onSuccess()
     }
 
     override suspend fun updateStepsDay(steps: StepsDay, onSuccess: () -> Unit) {
-        database.stepsDao.updateStepsDay(steps)
+        stepsDao.updateStepsDay(steps)
         onSuccess()
     }
 
     override suspend fun addLatestSteps(stepsToAdd: Int, onSuccess: () -> Unit) {
-        database.stepsDao.addLatestSteps(stepsToAdd)
+        stepsDao.addLatestSteps(stepsToAdd)
         onSuccess()
     }
 
     override fun getStepsDay(key: Long): LiveData<StepsDay?> {
-        return database.stepsDao.getStepsDay(key)
+        return stepsDao.getStepsDay(key)
     }
 
-    override val getAllStepsDays: LiveData<List<StepsDay>> = database.stepsDao.getAllStepsDays()
+    override val getAllStepsDays: LiveData<List<StepsDay>> = stepsDao.getAllStepsDays()
 
-    override val getLatestStepsDay: LiveData<StepsDay> = database.stepsDao.getLatestStepsDay()
+    override val getLatestStepsDay: LiveData<StepsDay> = stepsDao.getLatestStepsDay()
 
-    override val getLatestStepsDayObservable: LiveData<StepsDay> = database.stepsDao.getLatestStepsDayObservable()
+    override val getLatestStepsDayObservable: LiveData<StepsDay> = stepsDao.getLatestStepsDayObservable()
+
+    suspend fun getStepsByDate(date: String): StepsDay? {
+        return stepsDao.getStepsByDate(date)
+    }
 
     override suspend fun deleteAllStepsDaysButLatest(onSuccess: () -> Unit) {
-        database.stepsDao.deleteAllStepsDaysButLatest()
+        stepsDao.deleteAllStepsDaysButLatest()
         onSuccess()
     }
 
     override suspend fun deleteAllStepsDaysButSeven(onSuccess: () -> Unit) {
-        database.stepsDao.deleteAllStepsDaysButSeven()
+        stepsDao.deleteAllStepsDaysButSeven()
         onSuccess()
     }
 
     override suspend fun insertGoal(goal: StepsGoal, onSuccess: () -> Unit) {
-        database.stepsDao.insertGoal(goal)
+        stepsDao.insertGoal(goal)
         onSuccess()
     }
 
     override suspend fun updateGoal(goal: StepsGoal, onSuccess: () -> Unit) {
-        database.stepsDao.updateGoal(goal)
+        stepsDao.updateGoal(goal)
         onSuccess()
     }
 
     override suspend fun deleteGoal(goal: StepsGoal, onSuccess: () -> Unit) {
-        database.stepsDao.deleteGoal(goal)
+        stepsDao.deleteGoal(goal)
         onSuccess()
     }
 
     override fun getGoal(key: Long): LiveData<StepsGoal?> {
-        return database.stepsDao.getGoal(key)
+        return stepsDao.getGoal(key)
     }
 
-    override val getAllGoals: LiveData<List<StepsGoal>> = database.stepsDao.getAllGoals()
+    override val getAllGoals: LiveData<List<StepsGoal>> = stepsDao.getAllGoals()
 }

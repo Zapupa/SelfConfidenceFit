@@ -6,7 +6,7 @@ import com.example.selfconfidencefit.data.local.models.StepsGoal
 
 interface IStepsRepository {
     //Шаги
-    suspend fun insertStepsDay(steps: StepsDay, onSuccess: ()-> Unit)
+    suspend fun insertStepsDay(steps: StepsDay)
 
     suspend fun updateStepsDay(steps: StepsDay, onSuccess: ()-> Unit)
 

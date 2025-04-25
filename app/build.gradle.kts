@@ -87,6 +87,19 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.room.compiler)
 
+    // Lifecycle
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+    implementation (libs.androidx.lifecycle.service)
+
+    // WorkManager
+    implementation (libs.androidx.work.runtime.ktx)
+
+    // Other implementation??
+    implementation (libs.androidx.appcompat)
+    implementation (libs.material)
+    implementation (libs.androidx.constraintlayout)
+
     implementation(libs.activity.compose)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.material)

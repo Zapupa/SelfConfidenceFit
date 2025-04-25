@@ -27,6 +27,8 @@ interface StepsDao {
     fun getLatestStepsDay(): LiveData<StepsDay> //val?
     @Query("SELECT * FROM steps_days ORDER BY date DESC LIMIT 1")
     fun getLatestStepsDayObservable(): LiveData<StepsDay> //val
+    @Query("SELECT * FROM steps_days WHERE date = :date")
+    suspend fun getStepsByDate(date: String): StepsDay?
     @Query("DELETE FROM steps_days WHERE id NOT IN(SELECT id FROM steps_days ORDER BY date DESC LIMIT 1)")
     suspend fun deleteAllStepsDaysButLatest()
     @Query("DELETE FROM steps_days WHERE id NOT IN (SELECT id FROM(SELECT id FROM steps_days ORDER BY id DESC LIMIT 7) foo)")
