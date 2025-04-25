@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Text
 import com.example.selfconfidencefit.data.local.models.StepsDay
 import com.example.selfconfidencefit.ui.theme.lightGray
-import com.example.selfconfidencefit.viewmodel.StepsViewModel
+import com.example.selfconfidencefit.features.pedometer.StepsViewModel
 
 @Composable
 fun MainScreen(navController: NavController){

@@ -1,4 +1,4 @@
-package com.example.selfconfidencefit.service
+package com.example.selfconfidencefit.features.pedometer.service
 
 import android.app.Service
 import android.content.Context

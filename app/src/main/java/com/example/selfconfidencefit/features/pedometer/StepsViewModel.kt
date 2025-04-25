@@ -1,4 +1,4 @@
-package com.example.selfconfidencefit.viewmodel
+package com.example.selfconfidencefit.features.pedometer
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

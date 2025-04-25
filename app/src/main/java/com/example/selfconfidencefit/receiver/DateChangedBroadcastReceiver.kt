@@ -5,19 +5,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.icu.util.Calendar
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.selfconfidencefit.data.local.DatabaseApp
 import com.example.selfconfidencefit.data.local.dao.StepsDao
 import com.example.selfconfidencefit.data.local.models.StepsDay
-import com.example.selfconfidencefit.di.MainModule
 import com.example.selfconfidencefit.utils.DateFormat
-import com.example.selfconfidencefit.viewmodel.StepsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
