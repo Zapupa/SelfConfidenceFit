@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.selfconfidencefit.ui.presentation.screens.MainScreen
 
 @Composable
 fun SetupNavHost(navController: NavHostController){
@@ -13,7 +12,7 @@ fun SetupNavHost(navController: NavHostController){
         startDestination = Screen.Main.route
     ){
         composable(route = Screen.Main.route){
-            MainScreen(navController = navController)
+            //MainScreen(navController = navController)
         }
     }
 }
