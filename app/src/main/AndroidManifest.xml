@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="false" />
 
     <application
         android:name=".di.StepsApplication"
@@ -33,8 +35,7 @@
             android:name=".features.pedometer.service.StepsSensorService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="health">
-        </service>
+            android:foregroundServiceType="health" />
 
         <receiver android:name=".receiver.BootReceiver" android:enabled="true" android:exported="true">
             <intent-filter>
@@ -43,9 +44,12 @@
         </receiver>
 
         <receiver android:name=".receiver.DateChangedBroadcastReceiver"
+            android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DATE_CHANGED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
             </intent-filter>
         </receiver>
     </application>

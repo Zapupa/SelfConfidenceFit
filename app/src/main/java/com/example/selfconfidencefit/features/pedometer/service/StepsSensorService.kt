@@ -14,7 +14,10 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.selfconfidencefit.R
+import com.example.selfconfidencefit.data.local.dao.StepsDao
 import com.example.selfconfidencefit.data.local.models.StepsDay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,93 +25,95 @@ import kotlinx.coroutines.launch
 import com.example.selfconfidencefit.data.local.repository.StepsRepository
 import com.example.selfconfidencefit.utils.DateFormat
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class StepsSensorService : Service(), SensorEventListener {
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private var currentDate = dateFormatter.format(Date())
     private var sensorManager: SensorManager? = null
-    private var stepSensor: Sensor? = null
+    private var stepCounterSensor: Sensor? = null
+    private var stepDetectorSensor: Sensor? = null
+    private var lastSteps = 0
     private var currentSteps = 0
-    private var lastSaveTime = 0L
     private val notificationId = 1
     private val channelId = "step_counter_channel"
 
+    // Добавляем флаг для отслеживания состояния foreground
+    private var isForeground = false
 
-    @Inject
-    lateinit var repository: StepsRepository
-
-    override fun onBind(intent: Intent?): IBinder? = null
-
-    override fun onCreate() {
-        super.onCreate()
-        createNotificationChannel()
-        startForeground(notificationId, createNotification())
-
-        initSensor()
-
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        stepSensor?.let {
-            sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
-        }
-
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_TIME_TICK)
-        }
-        registerReceiver(dateChangeReceiver, filter)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sensorManager?.unregisterListener(this)
-        unregisterReceiver(dateChangeReceiver)
-        saveCurrentSteps()
-    }
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        event?.let {
-            currentSteps = it.values[0].toInt()
-            // Сохраняем каждые 10 минут или при закрытии
-            if (System.currentTimeMillis() - lastSaveTime > 10 * 60 * 1000) {
-                saveCurrentSteps()
-            }
-        }
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-
-    private fun saveCurrentSteps() {
-        val currentDate = DateFormat.standardFormat(Date())
-        CoroutineScope(Dispatchers.IO).launch {
-            val existingEntry = repository.getStepsByDate(currentDate)
-            val totalSteps = existingEntry?.steps?.plus(currentSteps) ?: currentSteps
-            repository.insertStepsDay(
-                StepsDay(
-                    date = currentDate,
-                    steps = totalSteps
-                )
-            )
-            lastSaveTime = System.currentTimeMillis()
-        }
-    }
+    @Inject lateinit var stepsDao: StepsDao
 
     private val dateChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == Intent.ACTION_TIME_TICK) {
-                val calendar = Calendar.getInstance()
-                val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-                val currentMinute = calendar.get(Calendar.MINUTE)
-
-                // Проверяем полночь
-                if (currentHour == 0 && currentMinute == 0) {
-                    saveCurrentSteps()
-                    currentSteps = 0 // Сбрасываем счетчик для нового дня
+            when (intent?.action) {
+                Intent.ACTION_DATE_CHANGED, Intent.ACTION_TIME_CHANGED -> {
+                    checkAndUpdateDate()
+                }
+                Intent.ACTION_TIME_TICK -> {
+                    // Проверяем полночь каждую минуту
+                    if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 0 &&
+                        Calendar.getInstance().get(Calendar.MINUTE) == 0) {
+                        checkAndUpdateDate()
+                    }
                 }
             }
         }
     }
+
+    override fun onCreate() {
+        super.onCreate()
+        initDateTracking()
+        createNotificationChannel()
+        startForegroundWithNotification()
+        initSensors()
+    }
+
+    private fun initSensors() {
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+        val sensorList = sensorManager!!.getSensorList(Sensor.TYPE_ALL)
+        Log.d("StepsSensor", "Available sensors: ${sensorList.joinToString { it.name }}")
+
+
+        stepCounterSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        stepDetectorSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+
+        when {
+            stepCounterSensor != null -> {
+                Log.d("StepsSensor", "Using STEP_COUNTER sensor")
+                sensorManager!!.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_UI)
+            }
+            stepDetectorSensor != null -> {
+                Log.d("StepsSensor", "Using STEP_DETECTOR sensor")
+                sensorManager!!.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_UI)
+            }
+            else -> {
+                Log.e("StepsSensor", "No step sensors available!")
+                stopSelf() // Останавливаем сервис, если датчиков нет
+            }
+
+        }
+    }
+
+    private fun startForegroundWithNotification() {
+        val notification = createNotification(10)
+        startForeground(notificationId, notification)
+        isForeground = true
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Если по какой-то причине сервис не в foreground, исправляем это
+        if (!isForeground) {
+            startForegroundWithNotification()
+        }
+        return START_STICKY
+    }
+
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -117,25 +122,99 @@ class StepsSensorService : Service(), SensorEventListener {
                 "Step Counter",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Tracks your steps"
+                description = "Tracking your steps"
             }
             getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
         }
     }
 
-    private fun createNotification(): Notification {
+    private fun createNotification(steps: Int): Notification {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Step Counter")
-            .setContentText("Tracking your steps...")
+            .setContentText("Steps today: $steps")
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // Убедитесь что этот ресурс существует
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOnlyAlertOnce(true)
             .build()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY
+    private fun initDateTracking() {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_DATE_CHANGED)
+            addAction(Intent.ACTION_TIME_CHANGED)
+            addAction(Intent.ACTION_TIME_TICK)
+        }
+        registerReceiver(dateChangeReceiver, filter)
     }
 
-    private fun initSensor() {
-        // Ваш код инициализации сенсора
+    private fun checkAndUpdateDate() {
+        val newDate = dateFormatter.format(Date())
+        if (newDate != currentDate) {
+            // Сохраняем шаги за предыдущий день
+            CoroutineScope(Dispatchers.IO).launch {
+                saveCurrentSteps()
+            }
+            currentDate = newDate
+            resetStepCounter()
+        }
+    }
+
+    private suspend fun saveCurrentSteps() {
+        val stepsEntity = stepsDao.getStepsByDate(currentDate) ?: StepsDay(date = currentDate, steps = 0)
+        stepsDao.insertStepsDay(stepsEntity.copy(steps = stepsEntity.steps + currentSteps))
+    }
+
+    private fun resetStepCounter() {
+        currentSteps = 0
+        lastSteps = 0
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+        // Обработка изменения точности сенсора
+        Log.d("StepsSensor", "Accuracy changed: $accuracy")
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        when (event.sensor.type) {
+            Sensor.TYPE_STEP_COUNTER -> {
+                // Для TYPE_STEP_COUNTER event.values[0] содержит общее количество шагов с момента регистрации
+                val totalSteps = event.values[0].toInt()
+
+                if (lastSteps == 0) {
+                    // Первое получение значения
+                    lastSteps = totalSteps
+                } else {
+                    // Вычисляем разницу с последним значением
+                    val stepsDiff = totalSteps - lastSteps
+                    currentSteps += stepsDiff
+                    lastSteps = totalSteps
+
+                    // Сохраняем шаги (например, в ViewModel или SharedPreferences)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        saveCurrentSteps()
+                    }
+                }
+            }
+
+            Sensor.TYPE_STEP_DETECTOR -> {
+                // Для TYPE_STEP_DETECTOR event.values[0] = 1.0 означает один шаг
+                if (event.values[0] == 1.0f) {
+                    currentSteps++
+                    CoroutineScope(Dispatchers.IO).launch {
+                        saveCurrentSteps()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(dateChangeReceiver)
+        CoroutineScope(Dispatchers.IO).launch {
+            saveCurrentSteps()
+        }
     }
 }

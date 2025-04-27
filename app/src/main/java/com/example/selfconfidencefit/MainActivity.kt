@@ -3,6 +3,7 @@ package com.example.selfconfidencefit
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,10 +32,19 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startStepCounterService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(Intent(this, StepsSensorService::class.java))
-        } else {
-            startService(Intent(this, StepsSensorService::class.java))
+        val serviceIntent = Intent(this, StepsSensorService::class.java)
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Для Android 8.0+
+                startForegroundService(serviceIntent)
+            } else {
+                // Для старых версий
+                startService(serviceIntent)
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to start service", e)
+            // Альтернативный запуск или обработка ошибки
         }
     }
 }

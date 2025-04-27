@@ -36,6 +36,10 @@ class StepsRepository @Inject constructor(private val stepsDao: StepsDao) : ISte
         return stepsDao.getStepsByDate(date)
     }
 
+    suspend fun incrementSteps(date: String, increment: Int){
+        stepsDao.incrementSteps(date, increment)
+    }
+
     override suspend fun deleteAllStepsDaysButLatest(onSuccess: () -> Unit) {
         stepsDao.deleteAllStepsDaysButLatest()
         onSuccess()
