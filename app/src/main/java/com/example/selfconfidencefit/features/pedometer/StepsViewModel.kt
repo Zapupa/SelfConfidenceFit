@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.example.selfconfidencefit.data.local.models.StepsDay
-import com.example.selfconfidencefit.data.local.models.StepsGoal
-import com.example.selfconfidencefit.data.local.repository.StepsRepository
+import com.example.selfconfidencefit.data.local.models.pedometer.StepsDay
+import com.example.selfconfidencefit.data.local.models.pedometer.StepsGoal
+import com.example.selfconfidencefit.data.local.repository.pedometer.StepsRepository
 import com.example.selfconfidencefit.utils.DateFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

@@ -17,13 +17,11 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.selfconfidencefit.R
-import com.example.selfconfidencefit.data.local.dao.StepsDao
-import com.example.selfconfidencefit.data.local.models.StepsDay
+import com.example.selfconfidencefit.data.local.dao.pedometer.StepsDao
+import com.example.selfconfidencefit.data.local.models.pedometer.StepsDay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.example.selfconfidencefit.data.local.repository.StepsRepository
-import com.example.selfconfidencefit.utils.DateFormat
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -132,7 +130,7 @@ class StepsSensorService : Service(), SensorEventListener {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Step Counter")
             .setContentText("Steps today: $steps")
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Убедитесь что этот ресурс существует
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOnlyAlertOnce(true)
             .build()
@@ -191,7 +189,7 @@ class StepsSensorService : Service(), SensorEventListener {
                     currentSteps += stepsDiff
                     lastSteps = totalSteps
 
-                    // Сохраняем шаги (например, в ViewModel или SharedPreferences)
+                    // Сохраняем шаги
                     CoroutineScope(Dispatchers.IO).launch {
                         saveCurrentSteps()
                     }

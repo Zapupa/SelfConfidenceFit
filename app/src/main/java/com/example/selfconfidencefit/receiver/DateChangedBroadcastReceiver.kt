@@ -5,8 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.icu.util.Calendar
-import com.example.selfconfidencefit.data.local.dao.StepsDao
-import com.example.selfconfidencefit.data.local.models.StepsDay
+import com.example.selfconfidencefit.data.local.dao.pedometer.StepsDao
+import com.example.selfconfidencefit.data.local.models.pedometer.StepsDay
 import com.example.selfconfidencefit.utils.DateFormat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope

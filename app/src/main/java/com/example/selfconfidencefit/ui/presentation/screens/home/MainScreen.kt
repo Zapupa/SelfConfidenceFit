@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material.Text
-import com.example.selfconfidencefit.data.local.models.StepsDay
+import com.example.selfconfidencefit.data.local.models.pedometer.StepsDay
 import com.example.selfconfidencefit.features.auth.AuthViewModel
 import com.example.selfconfidencefit.ui.theme.lightGray
 import com.example.selfconfidencefit.features.pedometer.StepsViewModel
