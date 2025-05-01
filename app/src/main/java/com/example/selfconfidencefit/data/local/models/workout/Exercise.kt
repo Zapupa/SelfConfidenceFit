@@ -17,5 +17,11 @@ data class Exercise(
     @ColumnInfo
     val caloriesBurned: Int,       // Количество затрачиваемых калорий
     @ColumnInfo
-    val type: String              // Тип упражнения
+    val type: String,              // Тип упражнения
+    @ColumnInfo
+    val isTimed: Boolean, // true - на время, false - на повторения
+    @ColumnInfo
+    val durationSeconds: Int, // Длительность в секундах (если isTimed = true)
+    @ColumnInfo
+    val repetitions: Int, // Количество повторений (если isTimed = false)
 )

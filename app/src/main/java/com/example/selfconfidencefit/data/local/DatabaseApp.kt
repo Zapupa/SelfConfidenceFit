@@ -11,6 +11,7 @@ import com.example.selfconfidencefit.data.local.models.pedometer.StepsGoal
 import com.example.selfconfidencefit.data.local.models.workout.Exercise
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlan
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanExerciseJoin
+import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanProgress
 
 @Database(
     entities = [
@@ -18,9 +19,10 @@ import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanExerci
         StepsGoal::class,
         WorkoutPlan::class,
         Exercise::class,
-        WorkoutPlanExerciseJoin::class
+        WorkoutPlanExerciseJoin::class,
+        WorkoutPlanProgress::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class DatabaseApp : RoomDatabase() {

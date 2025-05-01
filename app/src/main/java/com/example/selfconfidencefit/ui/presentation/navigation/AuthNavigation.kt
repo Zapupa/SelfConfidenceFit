@@ -13,6 +13,7 @@ import com.example.selfconfidencefit.ui.presentation.screens.auth.RegistrationSc
 import com.example.selfconfidencefit.ui.presentation.screens.home.MainScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.AddExerciseScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.AddWorkoutPlanScreen
+import com.example.selfconfidencefit.ui.presentation.screens.workout.ExerciseExecutionScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlanDetailsScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlansScreen
 
@@ -77,13 +78,19 @@ fun AuthNavigation(navController: NavHostController) {
 
         //Workout plan
         composable(Destinations.WorkoutPlans.route) {
-            WorkoutPlansScreen(
-                onNavigateToAddPlan = { navController.navigate(Destinations.AddWorkoutPlan.route) },
-                onNavigateToPlanDetails = { planId ->
-                    navController.navigate("workout_plan_details/$planId")
-                }
+            WorkoutPlansScreen { planId ->
+                navController.navigate("execution/$planId")
+            }
+        }
+
+        composable("execution/{planId}") { backStackEntry ->
+            val planId = backStackEntry.arguments?.getString("planId")?.toLongOrNull() ?: 0L
+            ExerciseExecutionScreen(
+                planId = planId,
+                onComplete = { navController.popBackStack() }
             )
         }
+
         composable(Destinations.AddWorkoutPlan.route) {
             AddWorkoutPlanScreen(onBack = { navController.popBackStack() })
         }

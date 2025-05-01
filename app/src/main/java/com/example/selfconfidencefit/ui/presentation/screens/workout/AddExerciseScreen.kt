@@ -1,6 +1,7 @@
 package com.example.selfconfidencefit.ui.presentation.screens.workout
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,6 +42,9 @@ fun AddExerciseScreen(
     var calories by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }
+    var isTimed by remember { mutableStateOf(true) }
+    var repetitions by remember { mutableIntStateOf(0) }
+    var durationSeconds by remember { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
@@ -88,6 +94,31 @@ fun AddExerciseScreen(
                 label = { Text("Image URL (optional)") },
                 modifier = Modifier.fillMaxWidth()
             )
+            OutlinedTextField(
+                value = repetitions.toString(),
+                onValueChange = { repetitions = it.toInt() },
+                label = { Text("Количество повторений") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isTimed
+            )
+            OutlinedTextField(
+                value = durationSeconds.toString(),
+                onValueChange = { durationSeconds = it.toInt() },
+                label = { Text("Время на упражнение") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = isTimed
+            )
+            Row(
+                modifier = Modifier
+            ) {
+                Text("Упражнение на таймер")
+                Checkbox(
+                    checked = true,
+                    onCheckedChange = {
+                        isTimed = false
+                    }
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
@@ -96,7 +127,10 @@ fun AddExerciseScreen(
                         description = description,
                         caloriesBurned = calories.toIntOrNull() ?: 0,
                         type = type,
-                        imageUrl = imageUrl.ifEmpty { null }
+                        imageUrl = imageUrl.ifEmpty { null },
+                        isTimed = isTimed,
+                        durationSeconds = durationSeconds,
+                        repetitions = repetitions,
                     )
                     onBack()
                 },

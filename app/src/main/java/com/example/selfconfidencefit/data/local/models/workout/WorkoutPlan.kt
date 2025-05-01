@@ -13,6 +13,10 @@ data class WorkoutPlan(
     @ColumnInfo
     val description: String,      // Описание
     @ColumnInfo
-    val type: String              // Тип тренировки
+    val type: String,              // Тип тренировки
+    @ColumnInfo
+    val totalProgress: Int = 0, // Общий прогресс выполнения (0-100)
+    @ColumnInfo
+    val lastCompleted: Long = 0 // Timestamp последнего выполнения
 )
 
