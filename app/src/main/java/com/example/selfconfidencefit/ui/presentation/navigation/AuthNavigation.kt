@@ -1,4 +1,4 @@
-package com.example.selfconfidencefit.features.auth.navigation
+package com.example.selfconfidencefit.ui.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +11,10 @@ import com.example.selfconfidencefit.ui.presentation.screens.auth.ForgotPassword
 import com.example.selfconfidencefit.ui.presentation.screens.auth.LoginScreen
 import com.example.selfconfidencefit.ui.presentation.screens.auth.RegistrationScreen
 import com.example.selfconfidencefit.ui.presentation.screens.home.MainScreen
+import com.example.selfconfidencefit.ui.presentation.screens.workout.AddExerciseScreen
+import com.example.selfconfidencefit.ui.presentation.screens.workout.AddWorkoutPlanScreen
+import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlanDetailsScreen
+import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlansScreen
 
 @Composable
 fun AuthNavigation(navController: NavHostController) {
@@ -70,5 +74,30 @@ fun AuthNavigation(navController: NavHostController) {
             )
 
         }
+
+        //Workout plan
+        composable(Destinations.WorkoutPlans.route) {
+            WorkoutPlansScreen(
+                onNavigateToAddPlan = { navController.navigate(Destinations.AddWorkoutPlan.route) },
+                onNavigateToPlanDetails = { planId ->
+                    navController.navigate("workout_plan_details/$planId")
+                }
+            )
+        }
+        composable(Destinations.AddWorkoutPlan.route) {
+            AddWorkoutPlanScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Destinations.AddExercise.route) {
+            AddExerciseScreen(onBack = { navController.popBackStack() })
+        }
+        composable("workout_plan_details/{workoutPlanId}") { backStackEntry ->
+            val workoutPlanId = backStackEntry.arguments?.getString("workoutPlanId")?.toLongOrNull() ?: 0L
+            WorkoutPlanDetailsScreen(
+                workoutPlanId = workoutPlanId,
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }
+
+

@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.selfconfidencefit.R
-import com.example.selfconfidencefit.features.auth.navigation.AuthNavigation
-import com.example.selfconfidencefit.features.auth.navigation.Destinations
+import com.example.selfconfidencefit.ui.presentation.navigation.AuthNavigation
+import com.example.selfconfidencefit.ui.presentation.navigation.Destinations
 
 @Composable
 fun MainApp(){
@@ -30,6 +30,10 @@ fun MainApp(){
 
     val bottomBarRoutes = listOf(
         Destinations.Home.route,
+        Destinations.WorkoutPlans.route,
+        Destinations.AddExercise.route,
+        Destinations.AddWorkoutPlan.route,
+        Destinations.WorkoutPlanDetails.route
     )
 
     val showBottomBar = currentRoute in bottomBarRoutes
@@ -60,12 +64,12 @@ fun MainApp(){
                         )
                         BottomNavigationItem(
                             selected = false, //Not implemented
-                            onClick = { navController.navigate(Destinations.Home.route) },
+                            onClick = { navController.navigate(Destinations.WorkoutPlans.route) },
                             icon = {
                                 Icon(
                                     painter = painterResource(R.drawable.exercisesicon),
                                     contentDescription = "Localized description",
-                                    tint = Color.White,
+                                    tint = if (currentRoute == Destinations.WorkoutPlans.route) Color.Yellow else Color.White,
                                     modifier = Modifier
                                         .size(30.dp)
                                 )
