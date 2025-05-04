@@ -13,6 +13,7 @@ import com.example.selfconfidencefit.data.local.models.workout.Exercise
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlan
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanExerciseJoin
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanProgress
+import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanWithDetails
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -39,17 +40,48 @@ interface WorkoutPlanDao {
     @Query("SELECT * FROM workout_plans WHERE id = :workoutPlanId")
     suspend fun getWorkoutPlanWithExercises(workoutPlanId: Long): WorkoutPlanWithExercises
 
+    @Query("SELECT * FROM workout_plans WHERE id = :workoutPlanId")
+    suspend fun getWorkoutPlan(workoutPlanId: Long): WorkoutPlan?
+
+    @Query("SELECT * FROM workout_plan_exercise_join WHERE workoutPlanId = :workoutPlanId")
+    suspend fun getExerciseJoins(workoutPlanId: Long): List<WorkoutPlanExerciseJoin>
+
+    @Query("SELECT * FROM exercises WHERE id IN (:exerciseIds)")
+    suspend fun getExercisesByIds(exerciseIds: List<Long>): List<Exercise>
+
+    @Query("SELECT exerciseId FROM workout_plan_exercise_join WHERE workoutPlanId = :workoutPlanId")
+    suspend fun getExerciseIdsForPlan(workoutPlanId: Long): List<Long>
+
     @Query("SELECT * FROM exercises")
     fun getExercises(): Flow<List<Exercise>>
 
     @Query("SELECT * FROM exercises WHERE id IN (SELECT exerciseId FROM workout_plan_exercise_join WHERE workoutPlanId = :workoutPlanId)")
     suspend fun getExercisesForWorkoutPlan(workoutPlanId: Long): List<Exercise>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProgress(progress: WorkoutPlanProgress)
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateProgress(progress: WorkoutPlanProgress)
+
+    suspend fun getWorkoutPlanWithDetails(workoutPlanId: Long): WorkoutPlanWithDetails? {
+        val workoutPlan = getWorkoutPlanById(workoutPlanId) ?: return null
+        val exercises = getExercisesForPlan(workoutPlanId)
+        val progress = getProgressForPlan(workoutPlanId)
+
+        return WorkoutPlanWithDetails(workoutPlan, exercises, progress)
+    }
+
+    @Query("SELECT * FROM workout_plans WHERE id = :workoutPlanId")
+    suspend fun getWorkoutPlanById(workoutPlanId: Long): WorkoutPlan?
+
+    @Query("""
+        SELECT exercises.* FROM exercises
+        INNER JOIN workout_plan_exercise_join 
+        ON exercises.id = workout_plan_exercise_join.exerciseId
+        WHERE workout_plan_exercise_join.workoutPlanId = :workoutPlanId
+    """)
+    suspend fun getExercisesForPlan(workoutPlanId: Long): List<Exercise>
 
     @Query("SELECT * FROM workout_plan_progress WHERE workoutPlanId = :workoutPlanId")
     suspend fun getProgressForPlan(workoutPlanId: Long): List<WorkoutPlanProgress>
@@ -83,3 +115,6 @@ data class WorkoutPlanWithProgress(
     )
     val progress: List<WorkoutPlanProgress>
 )
+
+
+

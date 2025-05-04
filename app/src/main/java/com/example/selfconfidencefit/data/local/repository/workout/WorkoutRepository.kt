@@ -6,6 +6,7 @@ import com.example.selfconfidencefit.data.local.models.workout.Exercise
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlan
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanExerciseJoin
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanProgress
+import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanWithDetails
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,6 +19,20 @@ class WorkoutRepository @Inject constructor(private val workoutPlanDao: WorkoutP
     override fun getAllWorkoutPlans(): Flow<List<WorkoutPlanWithProgress>> = workoutPlanDao.getAllWorkoutPlans()
     override suspend fun getWorkoutPlanWithExercises(workoutPlanId: Long) = workoutPlanDao.getWorkoutPlanWithExercises(workoutPlanId)
 
+    suspend fun getWorkoutPlanWithDetails(workoutPlanId: Long): WorkoutPlanWithDetails {
+        val workoutPlan = workoutPlanDao.getWorkoutPlan(workoutPlanId)
+            ?: throw IllegalArgumentException("Workout plan not found")
+
+        val exercises = workoutPlanDao.getExercisesForPlan(workoutPlanId)
+        val progress = workoutPlanDao.getProgressForPlan(workoutPlanId)
+
+        return WorkoutPlanWithDetails(
+            workoutPlan = workoutPlan,
+            exercises = exercises,
+            progress = progress
+        )
+    }
+
     // Exercise
     suspend fun insertExercise(exercise: Exercise) = workoutPlanDao.insertExercise(exercise)
     override suspend fun getExercises(): Flow<List<Exercise>> = workoutPlanDao.getExercises()
@@ -28,18 +43,19 @@ class WorkoutRepository @Inject constructor(private val workoutPlanDao: WorkoutP
         workoutPlanDao.insertJoin(WorkoutPlanExerciseJoin(workoutPlanId, exerciseId))
     }
 
-    override suspend fun createWorkoutPlanWithExercises(
-        plan: WorkoutPlan,
-        exercises: List<Exercise>
-    ): Long {
+    override suspend fun createWorkoutPlanWithExercises(plan: WorkoutPlan, exercises: List<Exercise>): Long {
         val planId = workoutPlanDao.insertWorkoutPlan(plan)
 
         exercises.forEach { exercise ->
             val exerciseId = workoutPlanDao.insertExercise(exercise)
+
+            workoutPlanDao.insertJoin(WorkoutPlanExerciseJoin(planId, exerciseId))
+
             workoutPlanDao.insertProgress(
                 WorkoutPlanProgress(
                     workoutPlanId = planId,
-                    exerciseId = exerciseId
+                    exerciseId = exerciseId,
+                    completed = false
                 )
             )
         }
@@ -47,10 +63,25 @@ class WorkoutRepository @Inject constructor(private val workoutPlanDao: WorkoutP
         return planId
     }
 
-    override suspend fun completeExercise(workoutPlanId: Long, exerciseId: Long) {
+    suspend fun fixDataIntegrity(workoutPlanId: Long) {
+        val existingJoins = workoutPlanDao.getExerciseJoins(workoutPlanId)
+
+        val allProgress = workoutPlanDao.getProgressForPlan(workoutPlanId)
+
+        val missingJoins = allProgress.filter { progress ->
+            existingJoins.none { join -> join.exerciseId == progress.exerciseId }
+        }
+
+        missingJoins.forEach { progress ->
+            workoutPlanDao.insertJoin(WorkoutPlanExerciseJoin(workoutPlanId, progress.exerciseId))
+        }
+    }
+
+    override suspend fun completeExercise(progressId:Long, workoutPlanId: Long, exerciseId: Long) {
         // Обновляем прогресс упражнения
         workoutPlanDao.updateProgress(
             WorkoutPlanProgress(
+                id = progressId,
                 workoutPlanId = workoutPlanId,
                 exerciseId = exerciseId,
                 completed = true,

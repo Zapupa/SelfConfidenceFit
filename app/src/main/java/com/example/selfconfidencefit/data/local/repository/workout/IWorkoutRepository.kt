@@ -22,5 +22,5 @@ interface IWorkoutRepository {
 
     suspend fun createWorkoutPlanWithExercises(plan: WorkoutPlan, exercises: List<Exercise>): Long
 
-    suspend fun completeExercise(workoutPlanId: Long, exerciseId: Long)
+    suspend fun completeExercise(progressId: Long, workoutPlanId: Long, exerciseId: Long)
 }

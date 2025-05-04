@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.selfconfidencefit.features.auth.AuthViewModel
 import com.example.selfconfidencefit.ui.presentation.screens.auth.ForgotPasswordScreen
 import com.example.selfconfidencefit.ui.presentation.screens.auth.LoginScreen
@@ -13,7 +15,8 @@ import com.example.selfconfidencefit.ui.presentation.screens.auth.RegistrationSc
 import com.example.selfconfidencefit.ui.presentation.screens.home.MainScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.AddExerciseScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.AddWorkoutPlanScreen
-import com.example.selfconfidencefit.ui.presentation.screens.workout.ExerciseExecutionScreen
+import com.example.selfconfidencefit.ui.presentation.screens.workout.CreateWorkoutPlanScreen
+import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutExecutionScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlanDetailsScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlansScreen
 
@@ -78,16 +81,33 @@ fun AuthNavigation(navController: NavHostController) {
 
         //Workout plan
         composable(Destinations.WorkoutPlans.route) {
-            WorkoutPlansScreen { planId ->
-                navController.navigate("execution/$planId")
-            }
+            WorkoutPlansScreen(
+                onCreateNewPlan = { navController.navigate("createWorkoutPlan") },
+                onPlanSelected = { planId ->
+                    navController.navigate("workout_execution/$planId")
+                }
+            )
         }
 
-        composable("execution/{planId}") { backStackEntry ->
-            val planId = backStackEntry.arguments?.getString("planId")?.toLongOrNull() ?: 0L
-            ExerciseExecutionScreen(
+        composable("createWorkoutPlan") {
+            CreateWorkoutPlanScreen(
+                onBack = { navController.popBackStack() },
+                onSaveComplete = { planId ->
+                    navController.popBackStack()
+                    navController.navigate("workout_execution/$planId") {
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable(
+            route = "workout_execution/{planId}",
+            arguments = listOf(navArgument("planId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val planId = backStackEntry.arguments?.getLong("planId") ?: 0L
+            WorkoutExecutionScreen(
                 planId = planId,
-                onComplete = { navController.popBackStack() }
+                onFinish = { navController.popBackStack() }
             )
         }
 
