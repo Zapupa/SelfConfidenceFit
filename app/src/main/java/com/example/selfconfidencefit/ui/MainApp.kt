@@ -31,9 +31,6 @@ fun MainApp(){
     val bottomBarRoutes = listOf(
         Destinations.Home.route,
         Destinations.WorkoutPlans.route,
-        Destinations.AddExercise.route,
-        Destinations.AddWorkoutPlan.route,
-        Destinations.WorkoutPlanDetails.route
     )
 
     val showBottomBar = currentRoute in bottomBarRoutes

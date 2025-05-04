@@ -3,10 +3,10 @@ package com.example.selfconfidencefit.features.workout
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.selfconfidencefit.data.local.dao.workout.WorkoutPlanWithExercises
 import com.example.selfconfidencefit.data.local.models.workout.Exercise
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlan
 import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanWithDetails
+import com.example.selfconfidencefit.data.local.models.workout.WorkoutPlanWithExercises
 import com.example.selfconfidencefit.data.local.repository.workout.WorkoutRepository
 import com.example.selfconfidencefit.ui.presentation.screens.workout.ExerciseWithProgress
 import com.example.selfconfidencefit.utils.Resource
@@ -29,31 +29,9 @@ class WorkoutViewModel @Inject constructor(private val repository: WorkoutReposi
     private val _workoutPlanState = MutableStateFlow<Resource<WorkoutPlanWithDetails>>(Resource.Loading)
     val workoutPlanState = _workoutPlanState.asStateFlow()
 
-    private val _currentWorkoutPlan = MutableStateFlow<WorkoutPlanWithExercises?>(null)
-    val currentWorkoutPlan = _currentWorkoutPlan.asStateFlow()
-
     // Exercises
     private val _exercises = MutableStateFlow<List<Exercise>>(emptyList())
     val exercises: StateFlow<List<Exercise>> = _exercises.asStateFlow()
-
-    // Выбранный WorkoutPlan
-    private val _selectedWorkoutPlan = MutableStateFlow<WorkoutPlan?>(null)
-    val selectedWorkoutPlan: StateFlow<WorkoutPlan?> = _selectedWorkoutPlan.asStateFlow()
-
-    private val _uiState = MutableStateFlow<UIState>(UIState.Loading)
-    val uiState = _uiState.asStateFlow()
-
-    sealed class UIState {
-        object Loading : UIState()
-        data class Success(val plan: WorkoutPlanWithExercises) : UIState()
-        data class Error(val message: String) : UIState()
-    }
-
-    sealed class WorkoutPlanState {
-        object Loading : WorkoutPlanState()
-        data class Success(val data: WorkoutPlanWithDetails) : WorkoutPlanState()
-        data class Error(val message: String) : WorkoutPlanState()
-    }
 
     init {
         loadWorkoutPlans()
@@ -125,30 +103,11 @@ class WorkoutViewModel @Inject constructor(private val repository: WorkoutReposi
         }
     }
 
-    fun getCurrentExercise(plan: WorkoutPlanWithExercises): Exercise? {
-        val nextProgress = plan.progress.firstOrNull { !it.completed }
-        return nextProgress?.let { progress ->
-            plan.exercises.firstOrNull { it.id == progress.exerciseId }
-        }
-    }
-
     private fun loadExercises() {
         viewModelScope.launch {
             repository.getExercises().collect { exercises ->
                 _exercises.value = exercises
             }
-        }
-    }
-
-    fun addWorkoutPlan(name: String, description: String, type: String) {
-        viewModelScope.launch {
-            repository.insertWorkoutPlan(
-                WorkoutPlan(
-                    name = name,
-                    description = description,
-                    type = type
-                )
-            )
         }
     }
 
@@ -168,17 +127,4 @@ class WorkoutViewModel @Inject constructor(private val repository: WorkoutReposi
             )
         }
     }
-
-    fun addExerciseToWorkoutPlan(workoutPlanId: Long, exerciseId: Long) {
-        viewModelScope.launch {
-            repository.addExerciseToWorkoutPlan(workoutPlanId, exerciseId)
-        }
-    }
-
-    fun selectWorkoutPlan(workoutPlanId: Long) {
-        viewModelScope.launch {
-            _selectedWorkoutPlan.value = repository.getWorkoutPlanWithExercises(workoutPlanId).workoutPlan
-        }
-    }
-
 }

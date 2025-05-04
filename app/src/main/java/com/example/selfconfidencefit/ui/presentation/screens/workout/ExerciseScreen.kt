@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,8 +50,8 @@ fun ExerciseScreen(
     viewModel: WorkoutViewModel = hiltViewModel(),
 ) {
     var isRunning by remember { mutableStateOf(true) }
-    var timeLeft by remember { mutableStateOf(if (exercise.isTimed) exercise.durationSeconds else 0) }
-    var repsDone by remember { mutableStateOf(0) }
+    var timeLeft by remember { mutableIntStateOf(if (exercise.isTimed) exercise.durationSeconds else 0) }
+    var repsDone by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(isRunning) {
         if (exercise.isTimed && isRunning && timeLeft > 0) {
@@ -141,7 +142,7 @@ private fun TimedExerciseView(
             progress = { if (totalTime > 0) 1 - (timeLeft.toFloat() / totalTime.toFloat()) else 0f },
             modifier = Modifier.size(200.dp),
             strokeWidth = 8.dp,
-            trackColor = ProgressIndicatorDefaults.circularTrackColor,
+            trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -185,10 +186,10 @@ private fun RepetitionExerciseView(
         )
 
         LinearProgressIndicator(
-            progress = if (totalReps > 0) repsDone.toFloat() / totalReps.toFloat() else 0f,
+            progress = { if (totalReps > 0) repsDone.toFloat() / totalReps.toFloat() else 0f },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(8.dp)
+                .height(8.dp),
         )
 
         Spacer(modifier = Modifier.height(32.dp))

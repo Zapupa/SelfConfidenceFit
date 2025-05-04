@@ -14,10 +14,8 @@ import com.example.selfconfidencefit.ui.presentation.screens.auth.LoginScreen
 import com.example.selfconfidencefit.ui.presentation.screens.auth.RegistrationScreen
 import com.example.selfconfidencefit.ui.presentation.screens.home.MainScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.AddExerciseScreen
-import com.example.selfconfidencefit.ui.presentation.screens.workout.AddWorkoutPlanScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.CreateWorkoutPlanScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutExecutionScreen
-import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlanDetailsScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutPlansScreen
 
 @Composable
@@ -82,26 +80,26 @@ fun AuthNavigation(navController: NavHostController) {
         //Workout plan
         composable(Destinations.WorkoutPlans.route) {
             WorkoutPlansScreen(
-                onCreateNewPlan = { navController.navigate("createWorkoutPlan") },
+                onCreateNewPlan = { navController.navigate(Destinations.CreateWorkoutPlan.route) },
                 onPlanSelected = { planId ->
-                    navController.navigate("workout_execution/$planId")
+                    navController.navigate("${Destinations.CreateWorkoutPlan.route}/$planId")
                 }
             )
         }
 
-        composable("createWorkoutPlan") {
+        composable(Destinations.CreateWorkoutPlan.route) {
             CreateWorkoutPlanScreen(
                 onBack = { navController.popBackStack() },
                 onSaveComplete = { planId ->
                     navController.popBackStack()
-                    navController.navigate("workout_execution/$planId") {
+                    navController.navigate("${Destinations.CreateWorkoutPlan.route}/$planId") {
                         launchSingleTop = true
                     }
                 }
             )
         }
         composable(
-            route = "workout_execution/{planId}",
+            route = "${Destinations.CreateWorkoutPlan.route}/{planId}",
             arguments = listOf(navArgument("planId") { type = NavType.LongType })
         ) { backStackEntry ->
             val planId = backStackEntry.arguments?.getLong("planId") ?: 0L
@@ -111,18 +109,8 @@ fun AuthNavigation(navController: NavHostController) {
             )
         }
 
-        composable(Destinations.AddWorkoutPlan.route) {
-            AddWorkoutPlanScreen(onBack = { navController.popBackStack() })
-        }
-        composable(Destinations.AddExercise.route) {
+        composable(Destinations.CreateExercise.route) {
             AddExerciseScreen(onBack = { navController.popBackStack() })
-        }
-        composable("workout_plan_details/{workoutPlanId}") { backStackEntry ->
-            val workoutPlanId = backStackEntry.arguments?.getString("workoutPlanId")?.toLongOrNull() ?: 0L
-            WorkoutPlanDetailsScreen(
-                workoutPlanId = workoutPlanId,
-                onBack = { navController.popBackStack() }
-            )
         }
     }
 }

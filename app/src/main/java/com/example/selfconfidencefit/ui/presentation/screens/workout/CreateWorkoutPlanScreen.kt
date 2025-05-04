@@ -108,7 +108,6 @@ fun CreateWorkoutPlanScreen(
                 }
             }
 
-            // Кнопка сохранения
             Button(
                 onClick = {
                     coroutineScope.launch {

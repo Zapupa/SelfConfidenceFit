@@ -8,8 +8,8 @@ sealed class Destinations(val route: String)  {
     object Home: Destinations("home_screen")
 
     object WorkoutPlans: Destinations("workout_plans")
-    object AddWorkoutPlan: Destinations("add_workout_plan")
-    object AddExercise: Destinations("add_exercise")
-    object WorkoutPlanDetails: Destinations("workout_plan_details")
+    object CreateWorkoutPlan: Destinations("create_workout_plan")
+    object CreateExercise: Destinations("create_exercise")
+    object WorkoutExecution: Destinations("workout_execution")
     object ExerciseExecution: Destinations("execution")
 }
