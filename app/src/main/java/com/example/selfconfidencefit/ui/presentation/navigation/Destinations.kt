@@ -12,4 +12,6 @@ sealed class Destinations(val route: String)  {
     object CreateExercise: Destinations("create_exercise")
     object WorkoutExecution: Destinations("workout_execution")
     object ExerciseExecution: Destinations("execution")
+
+    object Profile: Destinations("profile_screen")
 }

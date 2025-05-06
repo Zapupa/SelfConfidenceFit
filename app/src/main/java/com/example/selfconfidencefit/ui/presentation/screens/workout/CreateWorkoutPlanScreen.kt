@@ -12,17 +12,23 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -39,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.selfconfidencefit.data.local.models.workout.EditableExercise
 import com.example.selfconfidencefit.features.workout.CreateWorkoutViewModel
@@ -54,6 +61,21 @@ fun CreateWorkoutPlanScreen(
     val coroutineScope = rememberCoroutineScope()
     var showExerciseDialog by remember { mutableStateOf(false) }
     var editedExerciseIndex by remember { mutableStateOf<Int?>(null) }
+
+    data class DropdownItem(
+        val title: String
+    )
+
+    val typeList= listOf(
+        DropdownItem( "Общая"),
+        DropdownItem("На руки"),
+        DropdownItem( "На ноги"),
+        DropdownItem("На пресс"),
+        DropdownItem("На спину")
+    )
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf(DropdownItem("Общая")) }
 
     Scaffold(
         topBar = {
@@ -83,15 +105,59 @@ fun CreateWorkoutPlanScreen(
                 value = viewModel.planName,
                 onValueChange = { viewModel.planName = it },
                 label = { Text("Название плана") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+
             )
 
             OutlinedTextField(
                 value = viewModel.planDescription,
                 onValueChange = { viewModel.planDescription = it },
                 label = { Text("Описание") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
             )
+
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    readOnly = true,
+                    value = selectedItem.title,
+                    onValueChange = {},
+                    label = { Text("Choose option") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                )
+
+                // Выпадающее меню
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    typeList.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option.title) },
+                            onClick = {
+                                viewModel.planType = option.title
+                                selectedItem = option
+                                expanded = false
+
+                            }
+                        )
+                    }
+                }
+            }
 
             // Список упражнений
             LazyColumn {
@@ -208,6 +274,21 @@ fun ExerciseEditDialog(
                     value = currentExercise.description,
                     onValueChange = { currentExercise = currentExercise.copy(description = it) },
                     label = { Text("Описание") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = currentExercise.caloriesBurned.toString(),
+                    onValueChange = { currentExercise = currentExercise.copy(caloriesBurned = it.toIntOrNull() ?: 10) },
+                    label = { Text("Количество каллорий") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = currentExercise.type,
+                    onValueChange = { currentExercise = currentExercise.copy(type = it) },
+                    label = { Text("Тип упражнения") },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

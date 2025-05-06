@@ -13,6 +13,7 @@ import com.example.selfconfidencefit.ui.presentation.screens.auth.ForgotPassword
 import com.example.selfconfidencefit.ui.presentation.screens.auth.LoginScreen
 import com.example.selfconfidencefit.ui.presentation.screens.auth.RegistrationScreen
 import com.example.selfconfidencefit.ui.presentation.screens.home.MainScreen
+import com.example.selfconfidencefit.ui.presentation.screens.profile.ProfileScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.AddExerciseScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.CreateWorkoutPlanScreen
 import com.example.selfconfidencefit.ui.presentation.screens.workout.WorkoutExecutionScreen
@@ -67,11 +68,6 @@ fun AuthNavigation(navController: NavHostController) {
         }
         composable(Destinations.Home.route) {
             MainScreen(
-                onSignOut = {
-                    navController.navigate(Destinations.Login.route) {
-                        popUpTo(Destinations.Home.route) { inclusive = true }
-                    }
-                },
                 navController = navController
             )
 
@@ -112,6 +108,20 @@ fun AuthNavigation(navController: NavHostController) {
         composable(Destinations.CreateExercise.route) {
             AddExerciseScreen(onBack = { navController.popBackStack() })
         }
+
+        //Profile
+
+        composable(Destinations.Profile.route) {
+            ProfileScreen(
+                onSignOut = {
+                    navController.navigate(Destinations.Login.route) {
+                        popUpTo(Destinations.Home.route) { inclusive = true }
+                    }
+                },
+                navController = navController
+            )
+        }
+
     }
 }
 

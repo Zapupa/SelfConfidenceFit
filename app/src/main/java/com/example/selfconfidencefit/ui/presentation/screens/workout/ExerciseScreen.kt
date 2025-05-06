@@ -67,9 +67,13 @@ fun ExerciseScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Column {
+        Column(
+
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 text = exercise.name,
                 style = MaterialTheme.typography.headlineMedium,
@@ -105,7 +109,7 @@ fun ExerciseScreen(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             OutlinedButton(
                 onClick = { viewModel.completeCurrentExercise() },

@@ -31,6 +31,7 @@ fun MainApp(){
     val bottomBarRoutes = listOf(
         Destinations.Home.route,
         Destinations.WorkoutPlans.route,
+        Destinations.Profile.route
     )
 
     val showBottomBar = currentRoute in bottomBarRoutes
@@ -60,7 +61,7 @@ fun MainApp(){
                             },
                         )
                         BottomNavigationItem(
-                            selected = false, //Not implemented
+                            selected = false,
                             onClick = { navController.navigate(Destinations.WorkoutPlans.route) },
                             icon = {
                                 Icon(
@@ -90,13 +91,13 @@ fun MainApp(){
                             unselectedContentColor = Color.White
                         )
                         BottomNavigationItem(
-                            selected = false, //Not implemented
-                            onClick = { navController.navigate(Destinations.Home.route) },
+                            selected = false,
+                            onClick = { navController.navigate(Destinations.Profile.route) },
                             icon = {
                                 Icon(
                                     painter = painterResource(R.drawable.profileicon),
                                     contentDescription = "Localized description",
-                                    tint = Color.White,
+                                    tint = if (currentRoute == Destinations.Profile.route) Color.Yellow else Color.White,
                                     modifier = Modifier
                                         .size(30.dp)
                                 )
@@ -114,7 +115,6 @@ fun MainApp(){
                 modifier = Modifier
                     .padding(innerPadding)
             ) {
-//                            SetupNavHost(navController = navController)
                 AuthNavigation(navController = navController)
             }
         }

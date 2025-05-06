@@ -1,5 +1,6 @@
 package com.example.selfconfidencefit.features.pedometer
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
@@ -10,6 +11,8 @@ import com.example.selfconfidencefit.data.local.repository.pedometer.StepsReposi
 import com.example.selfconfidencefit.utils.DateFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -104,9 +107,13 @@ class StepsViewModel @Inject constructor(private val repository: StepsRepository
         }
     }
 
-    val todaySteps: LiveData<Int> = liveData {
+    val todaySteps: Flow<Int> = flow {
         val today = DateFormat.standardFormat(Date())
         repository.getStepsByDate(today)?.steps?.let { emit(it) } ?: emit(0)
+    }
+
+    val activeGoal: Flow<Int> = flow{
+        repository.getGoal(1).value?.goal?.let { emit(it) } ?: emit(10000)
     }
 
 }
