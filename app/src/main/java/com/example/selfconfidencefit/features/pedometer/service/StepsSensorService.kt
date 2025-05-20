@@ -15,10 +15,12 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.core.app.NotificationCompat
 import com.example.selfconfidencefit.R
 import com.example.selfconfidencefit.data.local.dao.pedometer.StepsDao
 import com.example.selfconfidencefit.data.local.models.pedometer.StepsDay
+import com.example.selfconfidencefit.features.pedometer.StepsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -99,7 +101,8 @@ class StepsSensorService : Service(), SensorEventListener {
     }
 
     private fun startForegroundWithNotification() {
-        val notification = createNotification(10)
+        val stepsObservable = stepsDao.getLatestStepsDayObservable().value?.steps ?: 0
+        val notification = createNotification(stepsObservable)
         startForeground(notificationId, notification)
         isForeground = true
     }
@@ -186,7 +189,7 @@ class StepsSensorService : Service(), SensorEventListener {
                 } else {
                     // Вычисляем разницу с последним значением
                     val stepsDiff = totalSteps - lastSteps
-                    currentSteps += stepsDiff
+                    currentSteps = stepsDiff
                     lastSteps = totalSteps
 
                     // Сохраняем шаги

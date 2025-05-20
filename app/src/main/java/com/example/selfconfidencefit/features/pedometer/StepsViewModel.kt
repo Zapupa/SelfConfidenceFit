@@ -107,9 +107,17 @@ class StepsViewModel @Inject constructor(private val repository: StepsRepository
         }
     }
 
-    val todaySteps: Flow<Int> = flow {
-        val today = DateFormat.standardFormat(Date())
-        repository.getStepsByDate(today)?.steps?.let { emit(it) } ?: emit(0)
+
+
+    val todaySteps: LiveData<Int> = liveData {
+        readLatestStepsDayObservable().value?.steps.let {
+            if (it != null) {
+                emit(it)
+            }
+            else{
+                emit(0)
+            }
+        }
     }
 
     val activeGoal: Flow<Int> = flow{

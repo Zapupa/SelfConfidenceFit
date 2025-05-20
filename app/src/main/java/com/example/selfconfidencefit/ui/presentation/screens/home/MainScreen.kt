@@ -66,14 +66,17 @@ fun MainScreen(
     stepVM: StepsViewModel = hiltViewModel<StepsViewModel>(),
     navController: NavController
 ){
-    val steps by stepVM.todaySteps.collectAsState(initial = 0)
+    val steps by stepVM.todaySteps.observeAsState(initial = 0)
 
-    val goalSteps by stepVM.activeGoal.collectAsState(initial = 10000)
+//    val goalSteps by stepVM.activeGoal.collectAsState(initial = 10000)
 
     var showGoalDialog by remember { mutableStateOf(false) }
 
     val stepDays = stepVM.readAllStepsDays().observeAsState(listOf()).value
-    val lastDay = stepVM.readLatestStepsDayObservable().observeAsState().value
+    val stepsObservable = stepVM.readLatestStepsDayObservable().observeAsState().value?.steps ?: 0
+//    val stepsObservable = lastDay?.steps ?: 0
+    val goalSteps = stepVM.readGoal(1).observeAsState().value?.goal ?: 10000
+//    val goalSteps = goal?.goal ?: 10000
 
     Box(
         modifier = Modifier.fillMaxSize().padding(vertical = 30.dp)
@@ -97,7 +100,7 @@ fun MainScreen(
 
                 // Прогресс
                 CircularProgressBar(
-                    progress = steps.toFloat() / goalSteps,
+                    progress = stepsObservable.toFloat() / goalSteps,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -106,7 +109,7 @@ fun MainScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "$steps",
+                        text = "$stepsObservable",
                         fontSize = 48.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -121,7 +124,7 @@ fun MainScreen(
 
                     // Прогресс в процентах
                     Text(
-                        text = "${(steps * 100 / goalSteps).coerceAtMost(100)}%",
+                        text = "${(stepsObservable * 100 / goalSteps).coerceAtMost(100)}%",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -146,7 +149,12 @@ fun MainScreen(
                     title = "Осталось",
                     value = "${(goalSteps - steps).coerceAtLeast(0)}",
                     modifier = Modifier.weight(1f),
-                    onClick = {}
+                    onClick = {stepVM.insertStepsDay(
+                        StepsDay(
+                            id = 1,
+                            date = DateFormat.standardFormat(Date())
+                        )
+                    )}
                 )
             }
             Card(
